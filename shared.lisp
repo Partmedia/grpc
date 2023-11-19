@@ -367,7 +367,7 @@ i of grpc_byte_buffer BUFFER."
 
 (defun convert-bytes-to-grpc-byte-buffer (bytes)
   "Given a lisp-vector of BYTES convert them to a grpc_byte_buffer."
-  (let ((array (cffi:foreign-alloc :char :initial-contents bytes)))
+  (let ((array (cffi:foreign-alloc :unsigned-char :initial-contents bytes)))
     (prog1
         (cffi:foreign-funcall "convert_bytes_to_grpc_byte_buffer"
                                :pointer array
