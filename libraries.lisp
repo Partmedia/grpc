@@ -13,6 +13,5 @@
 	;; Load lib on mac
 	(:darwin #.(namestring (asdf:system-relative-pathname "grpc" "grpc.so")))
     ;; Load the C wrapper directly from the source directory.
-    (t (:default #.(namestring
-                    (asdf:system-relative-pathname "grpc" "grpc")))))
+    (t (:default #.(namestring "/opt/grpc"))))
   (cffi:load-foreign-library 'grpc-client-wrapper))
