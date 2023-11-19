@@ -140,20 +140,21 @@ can receive a call."
             (message (apply #'concatenate '(array (unsigned-byte 8) (*)) messages)))
        (send-initial-metadata call)
        (unwind-protect
-            (let* ((method (find (call-method-name call)
-                                 methods
-                                 :test #'string=
-                                 :key #'method-details-name))
-                   (deserialized-message
-                    (funcall (method-details-deserializer method) message))
-                   (response
-                    (funcall (method-details-action method)
-                             deserialized-message call))
-                   (serialized-response
-                    (funcall (method-details-serializer method) response)))
-              (send-message call serialized-response)
-              (server-send-status call)
-              (server-recv-close call))
+         (let* ((method (find (call-method-name call)
+                              methods
+                              :test #'string=
+                              :key #'method-details-name)))
+           (if (null method)
+               (progn
+                 (print (call-method-name call))
+                 (print methods)
+                 (break)))
+           (let* ((deserialized-message (funcall (method-details-deserializer method) message))
+                  (response (funcall (method-details-action method) deserialized-message call))
+                  (serialized-response (funcall (method-details-serializer method) response)))
+             (send-message call serialized-response)
+             (server-send-status call)
+             (server-recv-close call)))
          (free-call-data call)))))
 
 (defun run-grpc-server (address methods
