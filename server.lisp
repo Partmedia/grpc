@@ -32,7 +32,8 @@
 (cffi:defcfun ("grpc_run_server" run-server )
   :pointer
   (server :pointer)
-  (server-credentials :pointer))
+  (server-credentials :pointer)
+  (sandbox :bool))
 
 (cffi:defcfun ("lisp_grpc_server_request_call" grpc-server-request-call )
   :pointer
@@ -163,7 +164,8 @@ can receive a call."
                          (grpc-insecure-server-credentials-create))
                         (cq grpc::*completion-queue*)
                         (num-threads 1)
-                        (dispatch-requests #'dispatch-requests))
+                        (dispatch-requests #'dispatch-requests)
+                        (sandbox nil))
   "Start a gRPC server.
 Parameters
   ADDRESS: The address to run the server on.
@@ -179,7 +181,7 @@ Parameters
     (dolist (method methods)
       (format t "~s~%" (method-details-name method))
       (register-method server (method-details-name method) address))
-    (run-server server server-creds)
+    (run-server server server-creds sandbox)
 
     (unwind-protect
          (dotimes (i num-threads)

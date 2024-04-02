@@ -147,7 +147,8 @@ Ignores TYPE CHANNEL METHOD and REQUEST."
                                (grpc-insecure-server-credentials-create))
                               (cq grpc::*completion-queue*)
                               (num-threads 1)
-                              (dispatch-requests #'dispatch-requests))
+                              (dispatch-requests #'dispatch-requests)
+                              (sandbox nil))
   "Start a gRPC server using protocol buffers.
 Parameters
   ADDRESS: The address to run the server on.
@@ -156,7 +157,8 @@ Parameters
   CQ: The completion queue to use.
   NUM-THREADS: The number of threads to have running.
   DISPATCH-CALL: A function to use to dispatch calls.
-                 Useful for debugging."
+                 Useful for debugging.
+  SANDBOX: If T, call cap_enter after starting server."
   (let* ((service (proto:find-service-descriptor service-name))
          method-details-list)
     (dolist (method (proto:proto-methods service))
@@ -176,6 +178,7 @@ Parameters
                      :server-creds server-creds
                      :cq cq
                      :num-threads num-threads
-                     :dispatch-requests dispatch-requests)))
+                     :dispatch-requests dispatch-requests
+                     :sandbox sandbox)))
 
 (cl:export '(run-grpc-proto-server))

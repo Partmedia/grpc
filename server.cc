@@ -8,6 +8,8 @@
 #include <grpc/impl/slice_type.h>
 #include <grpc/status.h>
 
+#include <sys/capsicum.h>
+
 namespace lisp {
 namespace lisp_grpc {
 
@@ -57,10 +59,12 @@ grpc_call* lisp_grpc_server_request_call(
 }
 
 grpc_server* grpc_run_server(grpc_server* server,
-                             grpc_server_credentials* server_creds){
+                             grpc_server_credentials* server_creds, bool sandbox){
   // Start a server and release a server credentials object
   grpc_server_start(server);
   grpc_server_credentials_release(server_creds);
+  if (sandbox)
+      cap_enter();
   return server;
 }
 
